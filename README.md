@@ -22,7 +22,8 @@ The usage below depends on tmfs: https://github.com/abique/tmfs.git
 
 ./sparse.py /path/to/<name>.sparsebundle /mnt
 losetup /dev/loop# /mnt/<name>.sparsebundle
-mount -r -t hfsplus /dev/loop# /mnt2
+kpartx -a /dev/loop#
+mount -r -t hfsplus /dev/mapper/loop#p2 /mnt2
 ./tmfs /mnt2 /mnt3
 
 /mnt3 will now contain the Time Machine backup file system, with directories
