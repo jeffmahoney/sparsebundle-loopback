@@ -62,34 +62,6 @@ class SingleFileFS(fuse.Fuse):
 
         return -errno.ENOENT
 
-    def mythread ( self ):
-        print '*** mythread'
-        return -errno.ENOSYS
-
-    def chmod ( self, path, mode ):
-        print '*** chmod', path, oct(mode)
-        return -errno.EACCES
-
-    def chown ( self, path, uid, gid ):
-        print '*** chown', path, uid, gid
-        return -errno.EACCES
-
-    def fsync ( self, path, isFsyncFile ):
-        print '*** fsync', path, isFsyncFile
-        return -errno.EACCES
-
-    def link ( self, targetPath, linkPath ):
-        print '*** link', targetPath, linkPath
-        return -errno.EACCES
-
-    def mkdir ( self, path, mode ):
-        print '*** mkdir', path, oct(mode)
-        return -errno.EACCES
-
-    def mknod ( self, path, mode, dev ):
-        print '*** mknod', path, oct(mode), dev
-        return -errno.EACCES
-
     def open (self, path, flags):
         if path != "/%s" % os.path.basename(self.source):
             return -errno.ENOENT
@@ -101,41 +73,5 @@ class SingleFileFS(fuse.Fuse):
 
         self.file.seek(offset, io.SEEK_SET)
         return self.file.read(length)
-
-    def readlink ( self, path ):
-        print '*** readlink', path
-        return -errno.ENOSYS
-
-    def release ( self, path, flags ):
-        print '*** release', path, flags
-        return -errno.EACCES
-
-    def rename ( self, oldPath, newPath ):
-        print '*** rename', oldPath, newPath
-        return -errno.EACCES
-
-    def rmdir ( self, path ):
-        print '*** rmdir', path
-        return -errno.EACCES
-
-    def statfs ( self ):
-        print '*** statfs'
-        return -errno.ENOSYS
-
-    def symlink ( self, targetPath, linkPath ):
-        return -errno.EACCES
-
-    def truncate ( self, path, size ):
-        return -errno.EACCES
-
-    def unlink ( self, path ):
-        print '*** unlink', path
-        return -errno.EACCES
-
-    def utime ( self, path, times ):
-        return -errno.EACCES
-
-    def write ( self, path, buf, offset ):
-        return -errno.EACCES
 
 # vim:set et sw=4 si:
