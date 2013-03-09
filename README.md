@@ -17,6 +17,9 @@ from Linux directly. AFP while using the sparsebundle bands is extremely
 slow over links with limited bandwidth, making using Time Machine directly
 difficult when traveling.
 
+sparse.py itself depends on libplist: http://cgit.sukimashita.com/libplist.git
+The usage below depends on tmfs: https://github.com/abique/tmfs.git
+
 ./sparse.py /path/to/<name>.sparsebundle /mnt
 losetup /dev/loop# /mnt/<name>.sparsebundle
 mount -r -t hfsplus /dev/loop# /mnt2
