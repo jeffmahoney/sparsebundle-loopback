@@ -1,27 +1,35 @@
 #!/usr/bin/env python
 
 import fuse
-import plistlib
 import time
 
 import stat
 import os
 import errno
 import sys
-
+import io
 
 class SparseFS(fuse.Fuse):
-    def __init__(self, source, properties, *args, **kw):
+    def __init__(self, source, fileptr=None, *args, **kw):
         fuse.Fuse.__init__(self, *args, **kw)
 
         self.source = source
-        self.band_size = int(p['band-size'])
-        self.size = int(p['size'])
+        self.file = fileptr
+
+        if not self.file:
+            self.file = open(self.source, "rb")
 
         st = os.stat(source)
 
         self.uid = st.st_uid
         self.gid = st.st_gid
+
+        # Get file size without stat
+        self.file.seek(0, io.SEEK_END)
+        self.size = self.file.tell()
+
+        # Reset file position
+        self.file.seek(0, io.SEEK_SET)
 
         print 'Init complete.'
 
@@ -88,34 +96,11 @@ class SparseFS(fuse.Fuse):
         return 0
 
     def read (self, path, length, offset):
-
         if path != "/%s" % os.path.basename(self.source):
             return -errno.ENOSYS
 
-        buf = ""
-
-        while length > 0:
-            band = offset / self.band_size
-            band_offset = offset % self.band_size
-            chunk = min(self.band_size - band_offset, length)
-            try:
-                f = open("%s/bands/%x" % (self.source, band), "rb")
-            except Exception, e:
-                return -errno.EIO
-
-            f.seek(band_offset)
-
-            buf += f.read(chunk)
-
-            f.close()
-
-            length -= chunk
-            offset += chunk
-
-        return buf
-
-        print '*** read', path, length, offset
-        return -errno.ENOSYS
+        self.file.seek(offset, io.SEEK_SET)
+        return self.file.read(length)
 
     def readlink ( self, path ):
         print '*** readlink', path
@@ -158,26 +143,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 2:
 	    source = sys.argv[1]
             source = os.path.realpath(source)
-            if not os.path.exists(source):
-                print >>sys.stderr, "%s does not exist." % source
-                sys.exit(1)
-            if not os.path.isdir(source):
-                print >>sys.stderr, "%s is not a directory" % source
-                sys.exit(1)
-            if not os.path.isfile(source + "/Info.plist"):
-                print >>sys.stderr, "%s is not a sparsebundle" % source
-                sys.exit(1)
+
+            bundle = SparseBundle(source)
             print "Using %s" % os.path.basename(source)
 
     if source is None:
         print >>sys.stderr, "Need source dir"
-        sys.exit(1)
-
-    p = plistlib.readPlist("/backup/jeffm/mba.sparsebundle/Info.plist")
-
-    print p['diskimage-bundle-type']
-    if p['diskimage-bundle-type'] != 'com.apple.diskimage.sparsebundle':
-        print >>sys.stderr, "%s is an unknown bundle type (%s)" % (source, p['diskimage-bundle-type'])
         sys.exit(1)
 
     fuse.fuse_python_api = (0, 2)
