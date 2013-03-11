@@ -3,21 +3,23 @@
 import sys
 import os
 import fuse
+import optparse
 
 from sparsebundle import SparseBundle
 import singlefilefs
 
-source = None
-if len(sys.argv) > 2:
-        source = sys.argv[1]
-        source = os.path.realpath(source)
+opts = fuse.FuseOptParse(usage=optparse.SUPPRESS_USAGE)
+(options, args) = opts.parse_args()
 
-        bundle = SparseBundle(source)
-        print "Using %s" % os.path.basename(source)
-
-if source is None:
-    print >>sys.stderr, "Need source dir"
+if len(args) != 1:
+    print >>sys.stderr, "usage: %s [opts] <sparsebundle dir> <mountpoint>" % \
+                        os.path.basename(sys.argv[0])
+    opts.print_help()
     sys.exit(1)
+
+source = os.path.realpath(args[0])
+bundle = SparseBundle(source)
+print "Using %s" % os.path.basename(source)
 
 fuse.fuse_python_api = (0, 2)
 fs = singlefilefs.SingleFileFS(source, bundle)
