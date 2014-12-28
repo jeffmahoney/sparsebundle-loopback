@@ -117,7 +117,7 @@ class SparseBundle(io.RawIOBase):
         elif whence == io.SEEK_CUR:
             self.offset += offset
         elif whence == io.SEEK_END:
-            self.offset = self.size + whence
+            self.offset = self.size + offset
         else:
             raise IOError("Illegal whence %d" % whence)
 
