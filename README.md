@@ -19,11 +19,13 @@ difficult when traveling.
 
 sparse.py itself depends on libplist: http://cgit.sukimashita.com/libplist.git
 
+```
 ./sparse.py /path/to/<name>.sparsebundle /mnt
 losetup /dev/loop# /mnt/<name>.sparsebundle
 kpartx -a /dev/loop#
 mount -r -t hfsplus /dev/mapper/loop#p2 /mnt2
 ./tmfs.py /mnt2 /mnt3
+```
 
 /mnt3 will now contain the Time Machine backup file system, with directories
 named with the dates the backup was taken, each containing the backup from
