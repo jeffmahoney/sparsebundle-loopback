@@ -7,6 +7,7 @@ import os
 import errno
 import sys
 import optparse
+import io
 
 # Apple Time Machine uses a version of HFS+ that allows zero length
 # regular files with a set number of hard links to exist without
